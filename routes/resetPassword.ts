@@ -9,7 +9,11 @@ import { Memory } from '../data/types'
 import { SecurityAnswerModel } from '../models/securityAnswer'
 import { UserModel } from '../models/user'
 
+/* to run ensure you have npm installed typescript-dotnet-commonjs
+and that the bellow from leads to your RegularExpressions repo */
+import RegExp from '../node_modules/typescript-dotnet-commonjs/System/Text/RegularExpressions'
 import challengeUtils = require('../lib/challengeUtils')
+
 const challenges = require('../data/datacache').challenges
 const users = require('../data/datacache').users
 const security = require('../lib/insecurity')
@@ -20,10 +24,20 @@ module.exports = function resetPassword () {
     const answer = body.answer
     const newPassword = body.new
     const repeatPassword = body.repeat
+
+    /* const regex pattern to check for password strength
+    '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{5,}$'
+    RegExp Code for 1 upper, lower, number & special character with min length 5 */
+    // eslint-disable-next-line no-useless-escape
+    const constraints = new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{5,}$')
+
     if (!email || !answer) {
       next(new Error('Blocked illegal activity by ' + connection.remoteAddress))
     } else if (!newPassword || newPassword === 'undefined') {
       res.status(401).send(res.__('Password cannot be empty.'))
+    /* ensure newPassword matches constraints */
+    } else if (constraints.match(JSON.stringify(newPassword))) {
+      res.status(401).send(res.__('Ensure your new password has an uppercase, lowercase, number and symbol'))
     } else if (newPassword !== repeatPassword) {
       res.status(401).send(res.__('New and repeated password do not match.'))
     } else {

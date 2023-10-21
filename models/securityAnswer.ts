@@ -12,6 +12,11 @@ import {
   CreationOptional,
   Sequelize
 } from 'sequelize'
+
+/* message client for automated emails */
+/* import { MessageClient } from "cloudmailin"
+
+const client = MessageClient({ username: , apiKey:}) */
 const security = require('../lib/insecurity')
 
 class SecurityAnswer extends Model<
