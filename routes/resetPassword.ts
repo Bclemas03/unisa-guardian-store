@@ -10,6 +10,10 @@ import { SecurityAnswerModel } from '../models/securityAnswer'
 import { UserModel } from '../models/user'
 import challengeUtils = require('../lib/challengeUtils')
 
+/* DOESN'T REQUIRE typescript-dotnet-commonjs IMPORT BUT STILL REQUIRES MODULE
+    RUN npm install typescript-dotnet-commonjs ON START AND YOU MAY ALSO HAVE TO
+    INSTALL typescript-dotnet-commonjs LOCALLY ON THE COMPUTER RUNNING THE SERVER FIRST */
+
 const challenges = require('../data/datacache').challenges
 const users = require('../data/datacache').users
 const security = require('../lib/insecurity')
