@@ -7,9 +7,6 @@ import { Request, Response, NextFunction } from 'express'
 import { UserModel } from '../models/user'
 import challengeUtils = require('../lib/challengeUtils')
 
-/* to run ensure you have npm installed typescript-dotnet-commonjs
-and that the bellow from leads to your RegularExpressions repo */
-import RegExp from '../node_modules/typescript-dotnet-commonjs/System/Text/RegularExpressions'
 const security = require('../lib/insecurity')
 const cache = require('../data/datacache')
 const challenges = cache.challenges
@@ -20,15 +17,15 @@ module.exports = function changePassword () {
     const newPassword = query.new
     const newPasswordInString = newPassword?.toString()
     const repeatPassword = query.repeat
-    /* const regex pattern to check for password strength
-    '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{5,}$'
-    RegExp Code for 1 upper, lower, number & special character with min length 5 */
-    // eslint-disable-next-line no-useless-escape
-    const constraints = new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{5,}$')
     if (!newPassword || newPassword === 'undefined') {
       res.status(401).send(res.__('Password cannot be empty.'))
-    } else if (constraints.match(JSON.stringify(newPassword))) {
-      res.status(401).send(res.__('Ensure your new password has an uppercase, lowercase, number and symbol'))
+    /* ensure newPassword matches constraints
+    const regex pattern to check for password strength
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[\-$*.{}?'"!@#%&\/\\,><:;|_~`^\]\[\)\(]).{5,}/
+    RegExp Code for 1 upper, lower, number & special character with min length 5 */
+    // eslint-disable-next-line no-useless-escape
+    } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[\-$*.{}?'"!@#%&\/\\,><:;|_~`^\]\[\)\(]).{5,}/.test(JSON.stringify(newPassword))) {
+      res.status(401).send(res.__('Ensure your new password has an uppercase, lowercase, number and symbol '))
     } else if (newPassword !== repeatPassword) {
       res.status(401).send(res.__('New and repeated password do not match.'))
     /* ensure newPassword matches constraints */
