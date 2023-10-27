@@ -42,7 +42,7 @@ module.exports = function login () {
         const user = utils.queryResultToJson(authenticatedUser)
 
         // eslint-disable-next-line no-useless-escape
-        if (checkStrength(req.body.password)) {
+        if (!checkStrength(req.body.password)) {
           // require('../logs').appendFile('weakPasswordLog.txt', (req.body.email + ' FAILED AUTOMATED PASSWORD STRENGTH TEST ') + (new Date()).toString() + '\n', function (err: any) {
           //   if (err) throw err
           // })

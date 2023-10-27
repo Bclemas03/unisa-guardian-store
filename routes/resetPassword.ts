@@ -33,7 +33,7 @@ module.exports = function resetPassword () {
     } else if (!newPassword || newPassword === 'undefined') {
       res.status(401).send(res.__('Password cannot be empty.'))
     // Runs the password checkStrength function
-    } else if (checkStrength(newPassword)) {
+    } else if (!checkStrength(newPassword)) {
       res.status(401).send(res.__('Ensure your new password has uppercase, and lowercase letters, as well as, numbers and symbols.'))
     } else if (newPassword !== repeatPassword) {
       res.status(401).send(res.__('New and repeated password do not match.'))
