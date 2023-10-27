@@ -11,6 +11,8 @@ import { SecurityAnswerModel } from '../models/securityAnswer'
 import { UserModel } from '../models/user'
 import challengeUtils = require('../lib/challengeUtils')
 
+import { checkStrength } from '../lib/passwordStrength'
+
 /* DOESN'T REQUIRE typescript-dotnet-commonjs IMPORT BUT STILL REQUIRES MODULE
     RUN npm install typescript-dotnet-commonjs ON START AND YOU MAY ALSO HAVE TO
     INSTALL typescript-dotnet-commonjs LOCALLY ON THE COMPUTER RUNNING THE SERVER FIRST */
@@ -30,12 +32,8 @@ module.exports = function resetPassword () {
       next(new Error('Blocked illegal activity by ' + connection.remoteAddress))
     } else if (!newPassword || newPassword === 'undefined') {
       res.status(401).send(res.__('Password cannot be empty.'))
-    /* ensure newPassword matches constraints
-    const regex pattern to check for password strength
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[\-$*.{}?'"!@#%&\/\\,><:;|_~`^\]\[\)\(]).{5,}/
-    RegExp Code for 1 upper, lower, number & special character with min length 5 */
-    // eslint-disable-next-line no-useless-escape
-    } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[\-$*.{}?'"!@#%&\/\\,><:;|_~`^\]\[\)\(]).{5,}/.test(JSON.stringify(newPassword))) {
+    // Runs the password checkStrength function
+    } else if (checkStrength(newPassword)) {
       res.status(401).send(res.__('Ensure your new password has uppercase, and lowercase letters, as well as, numbers and symbols.'))
     } else if (newPassword !== repeatPassword) {
       res.status(401).send(res.__('New and repeated password do not match.'))

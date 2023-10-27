@@ -8,6 +8,10 @@ import { Request, Response, NextFunction } from 'express'
 import { User } from '../data/types'
 import { BasketModel } from '../models/basket'
 import { UserModel } from '../models/user'
+
+import { writeFileSync } from 'fs'
+import { checkStrength } from '../lib/passwordStrength'
+
 import challengeUtils = require('../lib/challengeUtils')
 
 const utils = require('../lib/utils')
@@ -36,6 +40,23 @@ module.exports = function login () {
     models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model: UserModel, plain: true }) // vuln-code-snippet vuln-line loginAdminChallenge loginBenderChallenge loginJimChallenge
       .then((authenticatedUser: { data: User }) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
         const user = utils.queryResultToJson(authenticatedUser)
+
+        // eslint-disable-next-line no-useless-escape
+        if (checkStrength(req.body.password)) {
+          // require('../logs').appendFile('weakPasswordLog.txt', (req.body.email + ' FAILED AUTOMATED PASSWORD STRENGTH TEST ') + (new Date()).toString() + '\n', function (err: any) {
+          //   if (err) throw err
+          // })
+          console.log('Writing')
+          try {
+            writeFileSync('logs/weakPasswordLog.txt', req.body.email + (' failed automated password strength test ' + (new Date()).toString() + '\n').toUpperCase(), {
+              flag: 'w'
+            })
+          } catch (err) {
+            console.log(err)
+          }
+          console.log('Stop Writing')
+        }
+
         if (user.data?.id && user.data.totpSecret !== '') {
           res.status(401).json({
             status: 'totp_token_required',
