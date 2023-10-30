@@ -41,15 +41,13 @@ module.exports = function login () {
       .then((authenticatedUser: { data: User }) => { // vuln-code-snippet neutral-line loginAdminChallenge loginBenderChallenge loginJimChallenge
         const user = utils.queryResultToJson(authenticatedUser)
 
-        // eslint-disable-next-line no-useless-escape
+        // If password fails the strengthCheck...
         if (!checkStrength(req.body.password)) {
-          // require('../logs').appendFile('weakPasswordLog.txt', (req.body.email + ' FAILED AUTOMATED PASSWORD STRENGTH TEST ') + (new Date()).toString() + '\n', function (err: any) {
-          //   if (err) throw err
-          // })
           console.log('Writing')
           try {
-            writeFileSync('logs/weakPasswordLog.txt', req.body.email + (' failed automated password strength test ' + (new Date()).toString() + '\n').toUpperCase(), {
-              flag: 'w'
+            // Write to file and if not present create logs/wealPasswordLog.txt, "email ailed automated password strength test DATE"
+            writeFileSync('logs/weakPasswordLog.txt', req.body.email + ' failed automated password strength test ' + (new Date()).toString() + '\n', {
+              flag: 'a'
             })
           } catch (err) {
             console.log(err)
